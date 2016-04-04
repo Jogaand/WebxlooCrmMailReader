@@ -19,6 +19,25 @@
       }
     }
   },
+  "webxloocrmmailreader_minute": {
+    "message": "хвилин"
+  },
+  "webxloocrmmailreader_second": {
+    "message": "секунд"
+  },
+  "webxloocrmmailreader_checkNewMailDelay": {
+    "message": "Перевіряти кожних"
+  },
+  "webxloocrmmailreader_showNotificationDelay": {
+    "message": "Показувати сповіщення кожних"
+  },
+  "webxloocrmmailreader_refreshCacheDelay": {
+    "message": "Скидувати кеш кожних"
+  },
+  "webxloocrmmailreader_notification_error": {
+    "message": "Не можу приєднатися до CRM. Спробуйте авторизуватись заново"
+  },
+
   "webxloocrmmailreader_notification_text": {
     "message": "Нових листів: $1",
     "placeholders": {

@@ -19,6 +19,25 @@
       }
     }
   },
+  "webxloocrmmailreader_minute": {
+    "message": "минут"
+  },
+  "webxloocrmmailreader_second": {
+    "message": "секунд"
+  },
+  "webxloocrmmailreader_checkNewMailDelay": {
+    "message": "Проверять каждые"
+  },
+  "webxloocrmmailreader_showNotificationDelay": {
+    "message": "Показывать уведомление каждые"
+  },
+  "webxloocrmmailreader_refreshCacheDelay": {
+    "message": "Сбрасывать кеш каждые"
+  },
+  "webxloocrmmailreader_notification_error": {
+    "message": "Не могу присоединиться к CRM. Попробуйте авторизироваться заново"
+  },
+
   "webxloocrmmailreader_notification_text": {
     "message": "Новых писем: $1",
     "placeholders": {
