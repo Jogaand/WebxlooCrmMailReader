@@ -1,0 +1,49 @@
+{
+  "webxloocrmmailreader_name": {
+    "message": "Webxloo Crm Mail Reader"
+  },
+  "webxloocrmmailreader_description": {
+    "message": "Displays the number of unread messages in your inbox. Also you can click the button to immediately check new emails."
+  },
+  "webxloocrmmailreader_notification_closebutton": {
+    "message": "Close"
+  },
+  "webxloocrmmailreader_notification_readbutton": {
+    "message": "Read"
+  },
+  "webxloocrmmailreader_exception": {
+    "message": "exception: $1",
+    "placeholders": {
+      "1": {
+        "content": "$1"
+      }
+    }
+  },
+  "webxloocrmmailreader_minute": {
+    "message": "minute"
+  },
+  "webxloocrmmailreader_second": {
+    "message": "second"
+  },
+  "webxloocrmmailreader_checkNewMailDelay": {
+    "message": "Check new email every"
+  },
+  "webxloocrmmailreader_showNotificationDelay": {
+    "message": "Show notification every"
+  },
+  "webxloocrmmailreader_refreshCacheDelay": {
+    "message": "Refresh cache every"
+  },
+  "webxloocrmmailreader_notification_error": {
+    "message": "Can't connect to the CRM. Try to login again"
+  },
+
+  "webxloocrmmailreader_notification_text": {
+    "message": "Amount of a new emails in your inbox: $1",
+    "placeholders": {
+      "1": {
+        "content": "$1"
+      }
+    }
+  }
+}

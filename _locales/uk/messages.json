@@ -1,0 +1,30 @@
+{
+  "webxloocrmmailreader_name": {
+    "message": "Webxloo Crm Mail Reader"
+  },
+  "webxloocrmmailreader_description": {
+    "message": "Показує кількість непрочитаних листів. Також ви можете натиснути на кнопку щоб перевірити листи негайно."
+  },
+  "webxloocrmmailreader_notification_closebutton": {
+    "message": "Закрити"
+  },
+  "webxloocrmmailreader_notification_readbutton": {
+    "message": "Читати"
+  },
+  "webxloocrmmailreader_exception": {
+    "message": "Помилка: $1",
+    "placeholders": {
+      "1": {
+        "content": "$1"
+      }
+    }
+  },
+  "webxloocrmmailreader_notification_text": {
+    "message": "Нових листів: $1",
+    "placeholders": {
+      "1": {
+        "content": "$1"
+      }
+    }
+  }
+}

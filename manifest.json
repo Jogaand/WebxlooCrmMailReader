@@ -1,0 +1,27 @@
+{
+  "background": {
+    "persistent": false,
+    "scripts": [
+      "background.js"
+    ]
+  },
+  "browser_action": {
+    "default_icon": "webxloocrmmailreader_not_logged_in.png"
+  },
+  "options_page": "options.html",
+  "default_locale": "en",
+  "description": "__MSG_webxloocrmmailreader_description__",
+  "icons": {
+    "128": "main_icon.png"
+  },
+  "name": "__MSG_webxloocrmmailreader_name__",
+  "permissions": [
+    "tabs",
+    "alarms",
+    "storage",
+    "notifications",
+    "*://crm.webxloo.com/"
+   ],
+  "version": "0.1.7",
+  "manifest_version": 2
+}

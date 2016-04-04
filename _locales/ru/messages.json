@@ -1,0 +1,30 @@
+{
+  "webxloocrmmailreader_name": {
+    "message": "Webxloo Crm Mail Reader"
+  },
+  "webxloocrmmailreader_description": {
+    "message": "Показывает количество непрочитанных писем. Также вы можете нажать на кнопку чтобы проверить письма немедленно."
+  },
+  "webxloocrmmailreader_notification_closebutton": {
+    "message": "Закрыть"
+  },
+  "webxloocrmmailreader_notification_readbutton": {
+    "message": "Читать"
+  },
+  "webxloocrmmailreader_exception": {
+    "message": "Ошибка: $1",
+    "placeholders": {
+      "1": {
+        "content": "$1"
+      }
+    }
+  },
+  "webxloocrmmailreader_notification_text": {
+    "message": "Новых писем: $1",
+    "placeholders": {
+      "1": {
+        "content": "$1"
+      }
+    }
+  }
+}
