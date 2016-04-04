@@ -167,35 +167,39 @@
         });
     };
 
+    var showNotificationPeriodicallyTimerId = null;
+    function showNotificationPeriodically(that, title, message, list, delay, callback) {
+        console.log('Notification showed');
+
+        window.clearTimeout(showNotificationPeriodicallyTimerId);
+        chrome.notifications.clear(that.notificationId);
+
+        chrome.notifications.create(
+            that.notificationId,
+            {
+                type     : 'basic',
+                iconUrl  : that.defaultIcon,
+                title    : title,
+                eventTime: Date.now(),
+                message  : message + "\n" + that.formatItems(list)
+            }
+        );
+
+        chrome.notifications.onClicked.addListener(function (notificationId) {
+            window.clearTimeout(showNotificationPeriodicallyTimerId);
+            chrome.notifications.clear(notificationId);
+            if (callback) {
+                callback();
+            }
+        });
+
+        showNotificationPeriodicallyTimerId = window.setTimeout(showNotificationPeriodically, delay, that, title, message, list, delay, callback);
+        return false;
+    }
+
     ExtensionNotification.prototype.showPeriodically = function (title, message, list, delay, callback) {
         var that    = this;
-        var timerId = window.setTimeout(
-            function tick() {
-                window.clearTimeout(timerId);
-
-                chrome.notifications.create(
-                    that.notificationId,
-                    {
-                        type     : 'basic',
-                        iconUrl  : that.defaultIcon,
-                        title    : title,
-                        eventTime: Date.now(),
-                        message  : message + "\n" + that.formatItems(list)
-                    }
-                );
-
-                chrome.notifications.onClicked.addListener(function (notificationId) {
-                    chrome.notifications.clear(notificationId);
-                    if (callback) {
-                        callback();
-                    }
-                });
-
-                timerId = window.setTimeout(tick, delay);
-                return false;
-            },
-            0
-        );
+        showNotificationPeriodically(that, title, message, list, delay, callback);
     };
     //</editor-fold>
 
