@@ -21,7 +21,7 @@
         return '*://' + getCrmDomain().replace(/^https?\:\/\//, '') + '/*';
     }
 
-    function getCrmEmailAdditionalParams(sugarAccountId, fromCache) {
+    function getCrmEmailAdditionalParams(sugarAccountId) {
         return ""
             .concat('ieId=', sugarAccountId, '&')
             .concat('to_pdf=', 'true', '&')
@@ -29,7 +29,18 @@
             .concat('action=', 'EmailUIAjax', '&')
             .concat('emailUIAction=', 'getMessageList', '&')
             .concat('mbox=', 'INBOX', '&')
-            .concat('forceRefresh=', fromCache)
+            .concat('forceRefresh=', false)
+            ;
+    }
+
+    function getCrmRefreshCacheAdditionalParams() {
+        return ""
+            .concat('sugar_body_only=', true, '&')
+            .concat('to_pdf=', true, '&')
+            .concat('module=', 'Emails', '&')
+            .concat('action=', 'EmailUIAjax', '&')
+            .concat('emailUIAction=', 'checkEmail', '&')
+            .concat('all=', true)
             ;
     }
 
@@ -564,11 +575,41 @@
                 (params.url ? params.url : ""),
                 (params.async ? params.async : true)
             );
-            xhr.send();
+            var data = undefined;
+            if (params.type.toUpperCase() == "POST" && params && params.data) {
+                xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
+                data = params.data;
+            }
+            xhr.send(data);
         } catch (e) {
             console.error(chrome.i18n.getMessage("webxloocrmmailreader_exception", e));
             handleError();
         }
+    };
+
+    ExtensionCore.prototype.refreshCache = function (params) {
+        // onBefore, onSuccess, onError, onFinish
+        if (!params) {
+            params = {};
+        }
+        if (params.onBefore) {
+            params.onBefore();
+        }
+
+        var that = this;
+        that.sendRequestToCrm({
+            type     : 'POST',
+            url      : getCrmDomain(),
+            async    : true,
+            data     : getCrmRefreshCacheAdditionalParams(),
+            onSuccess: function (response) {
+                if (params.onSuccess) {
+                    params.onSuccess(response);
+                }
+            },
+            onError  : (params.onError ? params.onError : null),
+            onFinish : (params.onFinish ? params.onFinish : null)
+        });
     };
 
     ExtensionCore.prototype.getUnreadEmailCount = function (params) {
@@ -585,7 +626,7 @@
             onSuccess: function (ieId) {
                 that.sendRequestToCrm({
                     type     : 'GET',
-                    url      : getCrmMailUrl() + '&' + getCrmEmailAdditionalParams(ieId, (params.fromCache ? params.fromCache : false)),
+                    url      : getCrmMailUrl() + '&' + getCrmEmailAdditionalParams(ieId),
                     async    : true,
                     onSuccess: function (response) {
                         if (params.onSuccess) {
@@ -614,35 +655,63 @@
     var showed        = false;
     var showedError   = false;
 
-    function worker(fromCache) {
-        /*console.log('Fired:', (fromCache ? fromCache : 'false'));*/
+    function worker(refreshCache) {
+        /*console.log('Fired:', (refreshCache ? refreshCache : 'false'));*/
         /*if (worked) {
             return;
         }*/
         worked = true;
+        if (!refreshCache) {
+            extensionCore.extensionIcon.setState('loading');
+            extensionCore.getUnreadEmailCount({
+                onSuccess: function (newEmailsCount) {
+                    extensionCore.extensionIcon.setState('active');
+                    extensionCore.extensionIcon.setText(newEmailsCount > 0 ? newEmailsCount : "");
 
-        extensionCore.extensionIcon.setState('loading');
-        extensionCore.getUnreadEmailCount({
-            fromCache: fromCache,
-            onSuccess: function (newEmailsCount) {
-                extensionCore.extensionIcon.setState('active');
-                extensionCore.extensionIcon.setText(newEmailsCount > 0 ? newEmailsCount : "");
+                    if (newEmailsCount > 0) {
+                        if (showed) {
+                            return;
+                        }
+                        showed = true;
 
-                if (newEmailsCount > 0) {
-                    if (showed) {
-                        return;
+                        extensionCore.extensionNotification.showPeriodically(
+                            chrome.i18n.getMessage("webxloocrmmailreader_name"),
+                            chrome.i18n.getMessage("webxloocrmmailreader_notification_text", newEmailsCount),
+                            [],
+                            extensionCore.extensionOptions.get('showNotificationDelay'),
+                            function () {
+                                showed = false;
+                                extensionCore.extensionTabs.find({
+                                    url      : extensionCore.tabFilter.emailUrl,
+                                    onSuccess: function (tab) {
+                                        extensionCore.extensionTabs.activate({
+                                            tabId      : tab.id,
+                                            focused    : true,
+                                            active     : true,
+                                            highlighted: true
+                                        });
+                                    }
+                                });
+                            }
+                        );
                     }
-                    showed = true;
+                    worked = false;
+                },
+                onFinish : function () {
+                    worked = false;
+                },
+                onError  : function () {
+                    extensionCore.extensionIcon.setState('inactive');
+                    extensionCore.extensionIcon.setText();
 
-                    extensionCore.extensionNotification.showPeriodically(
+                    extensionCore.extensionNotification.show(
                         chrome.i18n.getMessage("webxloocrmmailreader_name"),
-                        chrome.i18n.getMessage("webxloocrmmailreader_notification_text", newEmailsCount),
+                        chrome.i18n.getMessage("webxloocrmmailreader_notification_error"),
                         [],
-                        extensionCore.extensionOptions.get('showNotificationDelay'),
+                        /*extensionCore.extensionOptions.get('showNotificationDelay'),*/
                         function () {
-                            showed = false;
                             extensionCore.extensionTabs.find({
-                                url      : extensionCore.tabFilter.emailUrl,
+                                url      : extensionCore.tabFilter.anyUrl,
                                 onSuccess: function (tab) {
                                     extensionCore.extensionTabs.activate({
                                         tabId      : tab.id,
@@ -650,48 +719,26 @@
                                         active     : true,
                                         highlighted: true
                                     });
+                                },
+                                onError  : function () {
+                                    extensionCore.extensionTabs.new({
+                                        url: extensionCore.tabFilter.emailUrl
+                                    });
                                 }
                             });
                         }
                     );
+
+                    worked = false;
                 }
-                worked = false;
-            },
-            onFinish : function () {
-                worked = false;
-            },
-            onError  : function () {
-                extensionCore.extensionIcon.setState('inactive');
-                extensionCore.extensionIcon.setText();
-
-                extensionCore.extensionNotification.show(
-                    chrome.i18n.getMessage("webxloocrmmailreader_name"),
-                    chrome.i18n.getMessage("webxloocrmmailreader_notification_error"),
-                    [],
-                    /*extensionCore.extensionOptions.get('showNotificationDelay'),*/
-                    function () {
-                        extensionCore.extensionTabs.find({
-                            url      : extensionCore.tabFilter.anyUrl,
-                            onSuccess: function (tab) {
-                                extensionCore.extensionTabs.activate({
-                                    tabId      : tab.id,
-                                    focused    : true,
-                                    active     : true,
-                                    highlighted: true
-                                });
-                            },
-                            onError  : function () {
-                                extensionCore.extensionTabs.new({
-                                    url: extensionCore.tabFilter.emailUrl
-                                });
-                            }
-                        });
-                    }
-                );
-
-                worked = false;
-            }
-        });
+            });
+        } else {
+            extensionCore.refreshCache({
+                onSuccess: function (newEmailsCount) {
+                    var sss = 1;
+                }
+            });
+        }
     }
 
     //</editor-fold>
